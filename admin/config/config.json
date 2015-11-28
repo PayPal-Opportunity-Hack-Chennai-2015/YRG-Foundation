@@ -23,6 +23,17 @@
                     "directory": "path:./controllers"
                 }]
             }
+        },
+        "appsec" : {
+            "enable" : false,
+            "module" : {
+                "name" : "lusca",
+                "arguments": [
+                    {
+                        "csrf": false
+                    }
+                ]
+            }
         }
     }
 }

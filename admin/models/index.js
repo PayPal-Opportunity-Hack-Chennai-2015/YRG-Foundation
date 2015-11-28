@@ -6,3 +6,9 @@ module.exports = function IndexModel() {
         name: 'Admin Panel'
     };
 };
+
+module.exports.Donor = require('./mongodb/donor');
+module.exports.Institutions = require('./mongodb/institutions');
+module.exports.Meals = require('./mongodb/meals');
+module.exports.Addons = require('./mongodb/addons');
+module.exports.Donations = require('./mongodb/donation');
