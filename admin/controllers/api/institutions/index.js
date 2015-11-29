@@ -58,4 +58,25 @@ module.exports = function(router) {
             res.json(response);
         }
     });
+
+    router.delete('/:id',function(req, res){
+        var id = req.params.id;
+
+        InstitutionModel.find({'id' : id}).remove(function(err){
+            if(err)
+                res.status(500).json({ 'error' : 'API Error', 'message': 'Could not delete institution'});
+            else
+                res.status(200).json({'message':'Success'});
+        });
+    });
+
+    router.patch('/:id', function(req, res){
+        var id = req.params.id;
+        InstitutionModel.update({'id': id}, req.body, function(err, numUpdated){
+            if(err)
+                res.status(500).json({'error': 'API Error', 'message' : 'Could not update records'});
+            else
+                res.json({'message' : 'Success', 'response' : numUpdated });
+        });
+    });
 };
