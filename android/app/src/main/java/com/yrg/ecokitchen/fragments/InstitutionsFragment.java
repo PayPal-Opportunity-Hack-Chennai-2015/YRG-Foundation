@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.yrg.ecokitchen.R;
 import com.yrg.ecokitchen.cards.RecyclerAdapter;
+import com.yrg.ecokitchen.cards.RecyclerClickListener;
 import com.yrg.ecokitchen.models.Institutions;
 
 import java.util.ArrayList;
@@ -22,7 +23,8 @@ public class InstitutionsFragment extends Fragment {
 
     public InstitutionsFragment() {
     }
-public static InstitutionsFragment newInstance(ArrayList<Institutions> list) {
+
+    public static InstitutionsFragment newInstance(ArrayList<Institutions> list) {
         InstitutionsFragment fragment = new InstitutionsFragment();
         Bundle args = new Bundle();
         args.putSerializable("institutions", list);
@@ -47,7 +49,7 @@ public static InstitutionsFragment newInstance(ArrayList<Institutions> list) {
         LinearLayoutManager linearLM = new LinearLayoutManager(getActivity());
         linearLM.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLM);
-        recyclerView.setAdapter(new RecyclerAdapter(institutions));
+        recyclerView.setAdapter(new RecyclerAdapter(institutions, (RecyclerClickListener) getActivity()));
         return cv;
     }
 

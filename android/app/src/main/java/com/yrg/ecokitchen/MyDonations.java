@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,46 +19,56 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import com.yrg.ecokitchen.db.DonationsBase;
 import com.yrg.ecokitchen.fragments.ContentFragment;
+import com.yrg.ecokitchen.fragments.DonationsFragment;
 import com.yrg.ecokitchen.fragments.EmptyFragment;
+import com.yrg.ecokitchen.models.Donations;
+import com.yrg.ecokitchen.models.MenuList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyDonations extends AppCompatActivity {
     private ListView drawerList;
     private DrawerLayout drawerLayout;
-    private ArrayAdapter<String> lists;
+    private MenuAdapter lists;
     private FrameLayout mainLayout;
     private ActionBarDrawerToggle drawlerToggle;
-    private String activityTitle;
+    private DonationsBase dbd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_donations);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setLogo(R.mipmap.launcher);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        dbd = new DonationsBase(this);
+        dbd.open();
+
         drawerList = (ListView)findViewById(R.id.navList);
         mainLayout = (FrameLayout) findViewById(R.id.mainLayout);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        activityTitle = "EcoKitchen";
 
-        String[] menu = { "My Donations", "About Us", "Contact" };
-        lists = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menu);
+        lists = new MenuAdapter(this, getMenuList());
         drawerList.setAdapter(lists);
 
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = parent.getAdapter().getItem(position).toString();
-                updateFragment(item);
+                MenuList item = (MenuList) parent.getAdapter().getItem(position);
+                updateFragment(item.title);
                 drawerLayout.closeDrawer(drawerList);
             }
         });
         setupDrawer();
 
+        updateFragment("My Donations");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -66,6 +77,12 @@ public class MyDonations extends AppCompatActivity {
                 startActivity(new Intent(MyDonations.this, Donate.class));
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbd.close();
     }
 
     private void setupDrawer() {
@@ -86,7 +103,14 @@ public class MyDonations extends AppCompatActivity {
     public void updateFragment(String item) {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
-        Fragment frag = ContentFragment.newInstance(item);
+        Fragment frag = new EmptyFragment();
+        if(item.equals("My Donations")) {
+            ArrayList<Donations> dons = dbd.getDonations();
+            frag = DonationsFragment.newInstance(dons);
+        }
+        else {
+            frag = ContentFragment.newInstance(item);
+        }
         setTitle(item);
         ft.replace(R.id.mainLayout, frag);
         ft.commit();
@@ -111,6 +135,16 @@ public class MyDonations extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private ArrayList<MenuList> getMenuList() {
+        ArrayList<MenuList> list = new ArrayList<>();
+        list.add(new MenuList("Actions", true));
+        list.add(new MenuList("My Donations", false));
+        list.add(new MenuList("Support", true));
+        list.add(new MenuList("About Us", false));
+        list.add(new MenuList("Contact", false));
+        return list;
     }
 
 }
